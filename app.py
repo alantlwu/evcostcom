@@ -63,10 +63,10 @@ gas_maintenance_cost = st.number_input("每年保養費用（$）", min_value=0,
 
 # 新增汽油規格與油價
 fuel_type = st.selectbox("選擇汽油規格", ["92無鉛汽油", "95無鉛汽油", "98無鉛汽油"])
-fuel_prices = {"92無鉛汽油": 29.19, "95無鉛汽油": 30.69, "98無鉛汽油": 32.69}
+fuel_prices = {"92無鉛汽油": 32.37, "95無鉛汽油": 33.87, "98無鉛汽油": 35.87}
 fuel_price = fuel_prices[fuel_type]
 st.write(f"目前選擇的汽油價格：${fuel_price} 每公升")
-st.write(f"資料參考經濟部能源署2024年對全台加油站油價抽樣採集之平均")
+st.write(f"資料參考經濟部能源署2026/05/31 ~ 2026/06/06年對全台加油站油價抽樣採集之平均")
 
 # 新增平均油耗輸入
 gas_fuel_efficiency = st.number_input("汽油車平均油耗（1公升/公里）", min_value=0.1, value=12.0)
@@ -77,10 +77,15 @@ ev_maintenance_cost = 2000  # 固定保養費用
 st.write(f"每年保養費用：${ev_maintenance_cost}（雨刷，雨刷水，冷氣濾芯）")
 ev_tax = 0  # 固定稅金成本
 st.write(f"每年稅金成本：${ev_tax}")
-st.write(f"電價資料參考台灣電力公司2024年發佈的台灣平均電價統計資料")
+st.write(f"電價資料參考台灣電力公司2025年發佈的台灣平均電價統計資料")
 
 # 持有年數
 years = st.number_input("持有年數", min_value=1, value=5)
+
+# 電價常數
+EV_ELECTRICITY_PRICE = 2.89  # 每度電價格（元）
+EV_KWH_PER_KM = 0.4 / 2.8   # 原始假設：0.4元/公里 ÷ 2.8元/度 = 每公里耗電量(度)
+ev_cost_per_km = EV_KWH_PER_KM * EV_ELECTRICITY_PRICE  # 以新電價重新計算每公里費用
 
 # 計算成本
 if st.button("計算成本"):
@@ -90,7 +95,7 @@ if st.button("計算成本"):
     gas_total_cost = gas_annual_cost * years
 
     # 電動車總成本
-    ev_annual_cost = calculate_annual_cost(mileage, 0.4, ev_maintenance_cost, ev_tax)
+    ev_annual_cost = calculate_annual_cost(mileage, ev_cost_per_km, ev_maintenance_cost, ev_tax)
     ev_total_cost = ev_annual_cost * years
 
     # 成本差額
@@ -112,7 +117,7 @@ if st.button("計算成本"):
     st.write(f"一年的汽油開支約為${int(mileage * gas_cost_per_km)}。相較之下，電動車行駛同等里數所耗電力只需其約六分之一的費用。")
     st.write(f"以車輛持有 {years} 年換車周期計算，一共可節省約${int(total_savings)}。\n\n")
     st.write(f"*我們假設同等級燃油車每1公升汽油可行駛 {gas_fuel_efficiency} 公里。")
-    st.write(f"*我們假設平均每千瓦小時的住宅電費為\$2.8，以及汽油價格為每公升\${fuel_price}。")
+    st.write(f"*我們假設平均每千瓦小時的住宅電費為\$2.89，以及汽油價格為每公升\${fuel_price}。")
 
     st.write(f"油價參考:https://www2.moeaea.gov.tw/oil111/Gasoline/NationwideAvg")
     st.write(f"電價參考:https://www.taipower.com.tw/2289/2363/2388/2389/10734/normalPost")
